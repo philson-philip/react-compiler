@@ -4,7 +4,7 @@ import styles from './Console.module.css';
 
 const ICONS = { log: '›', warn: '⚠', error: '✕', info: 'ℹ' };
 
-export default function Console() {
+export default function Console({ height = 180 }) {
   const { consoleMsgs, clearConsole } = usePlayground();
   const [collapsed, setCollapsed] = useState(false);
   const bodyRef = useRef(null);
@@ -26,7 +26,7 @@ export default function Console() {
   return (
     <div
       className={`${styles.wrap} ${collapsed ? styles.collapsed : ''}`}
-      style={{ height: collapsed ? 'var(--tab-h)' : '180px' }}
+      style={{ height: collapsed ? 'var(--tab-h)' : `${height}px` }}
     >
       {/* Header bar */}
       <div className={styles.bar} onClick={() => setCollapsed((c) => !c)}>
