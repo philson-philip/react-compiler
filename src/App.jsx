@@ -83,17 +83,35 @@ function AppLayout() {
     const column = previewColumnRef.current;
     if (!column) return;
 
+    const startY = e.clientY;
+    const startHeight = consoleHeight;
+    const columnHeight = column.getBoundingClientRect().height;
+    const minHeight = 35;
+    const maxHeight = Math.max(minHeight, columnHeight - 120);
+    let rafId = 0;
+    let pendingHeight = startHeight;
+
+    const flushHeight = () => {
+      rafId = 0;
+      setConsoleHeight(pendingHeight);
+    };
+
     const onMouseMove = (moveEvent) => {
-      const rect = column.getBoundingClientRect();
-      const rawHeight = rect.bottom - moveEvent.clientY;
-      const minHeight = 35;
-      const maxHeight = Math.max(minHeight, rect.height - 120);
-      const nextHeight = Math.min(maxHeight, Math.max(minHeight, rawHeight));
-      setConsoleHeight(nextHeight);
+      const deltaY = moveEvent.clientY - startY;
+      const rawHeight = startHeight - deltaY;
+      pendingHeight = Math.min(maxHeight, Math.max(minHeight, rawHeight));
+
+      if (!rafId) {
+        rafId = window.requestAnimationFrame(flushHeight);
+      }
     };
 
     const onMouseUp = () => {
       document.body.classList.remove('is-resizing-y');
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
     };
@@ -101,29 +119,50 @@ function AppLayout() {
     document.body.classList.add('is-resizing-y');
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
-  }, []);
+  }, [consoleHeight]);
 
   const handleEditorPreviewResizeStart = useCallback((e) => {
     e.preventDefault();
     const grid = appGridRef.current;
     if (!grid) return;
 
+    const rect = grid.getBoundingClientRect();
+    const sidebarWidth = isExplorerCollapsed ? 0 : 210;
+    const splitterWidth = 6;
+    const minPaneWidth = 280;
+    const maxEditorWidth = Math.max(
+      minPaneWidth,
+      rect.width - sidebarWidth - splitterWidth - minPaneWidth
+    );
+    const startX = e.clientX;
+    const startWidth = Math.min(
+      maxEditorWidth,
+      Math.max(minPaneWidth, e.clientX - rect.left - sidebarWidth)
+    );
+    let rafId = 0;
+    let pendingWidth = startWidth;
+
+    const flushWidth = () => {
+      rafId = 0;
+      setEditorWidth(pendingWidth);
+    };
+
     const onMouseMove = (moveEvent) => {
-      const rect = grid.getBoundingClientRect();
-      const sidebarWidth = isExplorerCollapsed ? 0 : 210;
-      const splitterWidth = 6;
-      const minPaneWidth = 280;
-      const maxEditorWidth = Math.max(
-        minPaneWidth,
-        rect.width - sidebarWidth - splitterWidth - minPaneWidth
-      );
-      const rawWidth = moveEvent.clientX - rect.left - sidebarWidth;
-      const nextWidth = Math.min(maxEditorWidth, Math.max(minPaneWidth, rawWidth));
-      setEditorWidth(nextWidth);
+      const deltaX = moveEvent.clientX - startX;
+      const rawWidth = startWidth + deltaX;
+      pendingWidth = Math.min(maxEditorWidth, Math.max(minPaneWidth, rawWidth));
+
+      if (!rafId) {
+        rafId = window.requestAnimationFrame(flushWidth);
+      }
     };
 
     const onMouseUp = () => {
       document.body.classList.remove('is-resizing-x');
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseup', onMouseUp);
     };

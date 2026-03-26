@@ -47,7 +47,15 @@ body.is-resizing-y {
   user-select: none;
 }
 
+body.is-resizing-y iframe {
+  pointer-events: none;
+}
+
 body.is-resizing-x {
   cursor: col-resize;
   user-select: none;
+}
+
+body.is-resizing-x iframe {
+  pointer-events: none;
 }

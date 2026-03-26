@@ -7,16 +7,20 @@ const ICONS = { log: '›', warn: '⚠', error: '✕', info: 'ℹ' };
 export default function Console({ height = 180 }) {
   const { consoleMsgs, clearConsole } = usePlayground();
   const [collapsed, setCollapsed] = useState(false);
+  const [showWarnings, setShowWarnings] = useState(true);
   const bodyRef = useRef(null);
 
   const errorCount = consoleMsgs.filter((m) => m.level === 'error').length;
+  const visibleMsgs = showWarnings
+    ? consoleMsgs
+    : consoleMsgs.filter((m) => m.level !== 'warn');
 
   // Auto-scroll to bottom
   useEffect(() => {
     if (bodyRef.current) {
       bodyRef.current.scrollTop = bodyRef.current.scrollHeight;
     }
-  }, [consoleMsgs]);
+  }, [visibleMsgs]);
 
   // Auto-expand on new error
   useEffect(() => {
@@ -43,6 +47,17 @@ export default function Console({ height = 180 }) {
         )}
 
         <div className={styles.spacer} />
+
+        <button
+          className={`${styles.toggleBtn} ${!showWarnings ? styles.toggleOff : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowWarnings((v) => !v);
+          }}
+          title={showWarnings ? 'Hide warnings' : 'Show warnings'}
+        >
+          Warnings
+        </button>
 
         <button
           className={styles.iconBtn}
@@ -79,10 +94,10 @@ export default function Console({ height = 180 }) {
       {/* Console body */}
       {!collapsed && (
         <div className={styles.body} ref={bodyRef}>
-          {consoleMsgs.length === 0 && (
+          {visibleMsgs.length === 0 && (
             <div className={styles.empty}>No console output</div>
           )}
-          {consoleMsgs.map((msg) => (
+          {visibleMsgs.map((msg) => (
             <div key={msg.id} className={`${styles.line} ${styles[msg.level]}`}>
               <span className={styles.prefix}>{ICONS[msg.level] || '›'}</span>
               <span className={styles.message}>{msg.message}</span>
