@@ -104,6 +104,52 @@ export default function CodeEditor({ onRun }) {
       handleFormatAndRun(editor);
     });
 
+    // Fallback auto-close for JSX/HTML tags in Monaco.
+    editor.onDidType((text) => {
+      if (text !== '>') return;
+
+      const model = editor.getModel();
+      const position = editor.getPosition();
+      if (!model || !position) return;
+
+      const line = model.getLineContent(position.lineNumber);
+      const beforeCursor = line.slice(0, position.column - 1);
+      const afterCursor = line.slice(position.column - 1);
+
+      if (beforeCursor.endsWith('/>')) return;
+
+      const tagMatch = beforeCursor.match(/<([A-Za-z][\w:-]*)\b[^<>]*>$/);
+      if (!tagMatch) return;
+
+      const openingTag = tagMatch[0];
+      if (openingTag.startsWith('</')) return;
+
+      const tagName = tagMatch[1];
+      if (!tagName) return;
+
+      // Avoid common non-JSX generic/comparison cases like `foo<Bar>`.
+      const ltIndex = beforeCursor.lastIndexOf('<');
+      const charBeforeLt = ltIndex > 0 ? beforeCursor[ltIndex - 1] : '';
+      if (/[A-Za-z0-9_$.)\]]/.test(charBeforeLt)) return;
+
+      if (afterCursor.trimStart().startsWith(`</${tagName}`)) return;
+
+      editor.executeEdits('auto-close-tag', [
+        {
+          range: new monaco.Range(
+            position.lineNumber,
+            position.column,
+            position.lineNumber,
+            position.column
+          ),
+          text: `</${tagName}>`,
+          forceMoveMarkers: true,
+        },
+      ]);
+
+      editor.setPosition(position);
+    });
+
     editor.focus();
   }, [handleFormatAndRun, onRun]);
 
@@ -167,6 +213,7 @@ export default function CodeEditor({ onRun }) {
             bracketPairColorization: { enabled: true },
             autoClosingBrackets: 'always',
             autoClosingQuotes: 'always',
+            autoClosingTags: 'always',
             formatOnPaste: true,
             tabSize: 2,
             wordWrap: 'off',
