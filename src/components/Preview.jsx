@@ -7,6 +7,11 @@ export default function Preview({ runTrigger }) {
   const { files, addConsoleMsg } = usePlayground();
   const iframeRef = useRef(null);
   const hasRun = useRef(false);
+  const filesRef = useRef(files);
+
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
 
   // Listen for console messages from the iframe
   useEffect(() => {
@@ -23,12 +28,12 @@ export default function Preview({ runTrigger }) {
   useEffect(() => {
     if (runTrigger === 0) return;
     hasRun.current = true;
-    const html = buildPreviewHTML(files);
+    const html = buildPreviewHTML(filesRef.current);
     const iframe = iframeRef.current;
     if (iframe) {
       iframe.srcdoc = html;
     }
-  }, [runTrigger, files]);
+  }, [runTrigger]);
 
   return (
     <div className={styles.pane}>
