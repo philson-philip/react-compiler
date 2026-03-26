@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* VS Code Dark+ palette */
+  --bg-titlebar: #1e1e1e;
+  --bg-sidebar: #252526;
+  --bg-editor: #1e1e1e;
+  --bg-panel: #1e1e1e;
+  --bg-tab-active: #1e1e1e;
+  --bg-tab-inactive: #2d2d2d;
+  --bg-hover: #2a2d2e;
+  --bg-active: #37373d;
+  --bg-input: #3c3c3c;
+  --border: #3c3c3c;
+  --border-tab: #252526;
+  --text: #d4d4d4;
+  --text-dim: #969696;
+  --text-muted: #6a6a6a;
+  --text-side: #cccccc;
+  --accent: #007acc;
+  --green: #2ea043;
+  --green-hover: #3fb950;
+  --error: #f44747;
+  --warning: #cca700;
+  --info: #3794ff;
+  --font-code: 'Fira Code', Consolas, 'Courier New', monospace;
+  --font-ui: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --titlebar-h: 36px;
+  --statusbar-h: 24px;
+  --actbar-w: 48px;
+  --sidebar-w: 210px;
+  --tab-h: 35px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-editor);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  font-family: inherit;
+}
+
+/* Scrollbar - VS Code style */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #424242; }
+::-webkit-scrollbar-thumb:hover { background: #555; }
+::-webkit-scrollbar-corner { background: var(--bg-editor); }

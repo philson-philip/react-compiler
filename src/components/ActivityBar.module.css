@@ -1,0 +1,41 @@
+.bar {
+  grid-row: 2;
+  background: #333333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px 0;
+  gap: 2px;
+  border-right: 1px solid var(--border);
+}
+
+.bar button {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  position: relative;
+  transition: color 0.1s;
+}
+.bar button:hover { color: var(--text); }
+
+.active { color: #fff !important; }
+.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: #fff;
+  border-radius: 0 2px 2px 0;
+}
+
+.bar button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.spacer { flex: 1; }

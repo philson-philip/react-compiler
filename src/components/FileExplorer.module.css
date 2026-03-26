@@ -1,0 +1,95 @@
+.sidebar {
+  grid-row: 2;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  padding: 10px 16px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.addBtn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--text-dim);
+  font-size: 16px;
+}
+.addBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.tree {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+
+.folder {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-side);
+  height: 22px;
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+}
+
+.file {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 36px;
+  cursor: pointer;
+  color: var(--text-side);
+  font-size: 13px;
+  height: 22px;
+  user-select: none;
+  transition: background 0.08s;
+}
+.file:hover {
+  background: var(--bg-hover);
+}
+.file.active {
+  background: var(--bg-active);
+}
+
+.newFileRow {
+  padding: 2px 8px 2px 36px;
+}
+.newFileRow input {
+  width: 100%;
+  padding: 2px 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: var(--font-code);
+  outline: none;
+}

@@ -1,0 +1,125 @@
+.wrap {
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: height 0.15s ease;
+}
+
+.collapsed {
+  height: var(--tab-h) !important;
+}
+
+/* ── Header bar ────────────────────────────────── */
+.bar {
+  display: flex;
+  align-items: center;
+  min-height: var(--tab-h);
+  padding: 0 8px;
+  gap: 4px;
+  background: var(--bg-tab-active);
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+.bar:hover {
+  background: var(--bg-hover);
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 6px;
+  border-bottom: 1px solid var(--accent);
+  margin-bottom: -1px;
+  padding-bottom: 1px;
+}
+
+.badge {
+  background: var(--error);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 0 5px;
+  min-width: 16px;
+  text-align: center;
+  line-height: 16px;
+}
+
+.spacer { flex: 1; }
+
+.iconBtn {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+.iconBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+/* ── Body ──────────────────────────────────────── */
+.body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+  font-family: var(--font-code);
+  font-size: 12px;
+  line-height: 1.6;
+  background: var(--bg-panel);
+}
+
+.empty {
+  color: var(--text-muted);
+  padding: 8px 12px;
+  font-style: italic;
+}
+
+.line {
+  display: flex;
+  align-items: flex-start;
+  padding: 2px 12px;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.prefix {
+  flex-shrink: 0;
+  user-select: none;
+  width: 20px;
+  text-align: center;
+}
+
+.message {
+  word-break: break-all;
+  flex: 1;
+  white-space: pre-wrap;
+}
+
+/* Level colors */
+.log .message { color: var(--text); }
+.log .prefix { color: var(--text-muted); }
+
+.warn { background: rgba(204, 167, 0, 0.06); }
+.warn .message { color: var(--warning); }
+.warn .prefix { color: var(--warning); }
+
+.error { background: rgba(244, 71, 71, 0.06); }
+.error .message { color: var(--error); }
+.error .prefix { color: var(--error); }
+
+.info .message { color: var(--info); }
+.info .prefix { color: var(--info); }
