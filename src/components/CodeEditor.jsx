@@ -1,6 +1,7 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { usePlayground } from '../contexts/PlaygroundContext';
+import { formatCode } from '../utils/formatCode';
 import styles from './CodeEditor.module.css';
 
 const FILE_LANG_MAP = {
@@ -34,6 +35,25 @@ export default function CodeEditor({ onRun }) {
 
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
+  const activeFileRef = useRef(activeFile);
+  const saveSeqRef = useRef(0);
+
+  useEffect(() => {
+    activeFileRef.current = activeFile;
+  }, [activeFile]);
+
+  const handleFormatAndRun = useCallback(async (editor) => {
+    const filename = activeFileRef.current;
+    const currentCode = editor.getValue();
+    const saveSeq = ++saveSeqRef.current;
+    const formatted = await formatCode(filename, currentCode);
+    if (saveSeq !== saveSeqRef.current) return;
+    if (editor.getValue() !== currentCode) return;
+    if (formatted !== currentCode) {
+      updateFile(filename, formatted);
+    }
+    onRun?.();
+  }, [onRun, updateFile]);
 
   const handleEditorDidMount = useCallback((editor, monaco) => {
     editorRef.current = editor;
@@ -73,11 +93,11 @@ export default function CodeEditor({ onRun }) {
 
     // Ctrl/Cmd+S to run
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-      onRun?.();
+      handleFormatAndRun(editor);
     });
 
     editor.focus();
-  }, [onRun]);
+  }, [handleFormatAndRun, onRun]);
 
   const handleChange = useCallback((value) => {
     if (value !== undefined) {
