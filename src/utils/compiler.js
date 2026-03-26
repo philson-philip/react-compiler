@@ -12,7 +12,8 @@ export function buildPreviewHTML(files) {
 <html>
 <head>
   <meta charset="UTF-8" />
-  <style>${cssCode}</style>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"><\/script>
+  <style type="text/tailwindcss">${cssCode}</style>
   <style>
     #root { padding: 20px; }
     .error-overlay {

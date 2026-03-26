@@ -8,12 +8,23 @@ import Console from './components/Console';
 import StatusBar from './components/StatusBar';
 import './App.css';
 
+const EXPLORER_COLLAPSED_STORAGE_KEY = 'react-playground:explorer-collapsed';
+
+function readExplorerCollapsedState() {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.sessionStorage.getItem(EXPLORER_COLLAPSED_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
 function AppLayout() {
   const { clearConsole } = usePlayground();
   const [runTrigger, setRunTrigger] = useState(0);
   const [consoleHeight, setConsoleHeight] = useState(180);
   const [editorWidth, setEditorWidth] = useState(0);
-  const [isExplorerCollapsed, setIsExplorerCollapsed] = useState(false);
+  const [isExplorerCollapsed, setIsExplorerCollapsed] = useState(readExplorerCollapsedState);
   const appGridRef = useRef(null);
   const previewColumnRef = useRef(null);
 
@@ -33,6 +44,18 @@ function AppLayout() {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [handleRun]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.sessionStorage.setItem(
+        EXPLORER_COLLAPSED_STORAGE_KEY,
+        String(isExplorerCollapsed)
+      );
+    } catch {
+      // Ignore storage errors (e.g. private mode restrictions).
+    }
+  }, [isExplorerCollapsed]);
 
   const handleConsoleResizeStart = useCallback((e) => {
     e.preventDefault();
