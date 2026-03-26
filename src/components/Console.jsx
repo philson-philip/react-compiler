@@ -8,12 +8,15 @@ export default function Console({ height = 180 }) {
   const { consoleMsgs, clearConsole } = usePlayground();
   const [collapsed, setCollapsed] = useState(false);
   const [showWarnings, setShowWarnings] = useState(true);
+  const [showErrors, setShowErrors] = useState(true);
   const bodyRef = useRef(null);
 
   const errorCount = consoleMsgs.filter((m) => m.level === 'error').length;
-  const visibleMsgs = showWarnings
-    ? consoleMsgs
-    : consoleMsgs.filter((m) => m.level !== 'warn');
+  const visibleMsgs = consoleMsgs.filter((m) => {
+    if (!showWarnings && m.level === 'warn') return false;
+    if (!showErrors && m.level === 'error') return false;
+    return true;
+  });
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -57,6 +60,17 @@ export default function Console({ height = 180 }) {
           title={showWarnings ? 'Hide warnings' : 'Show warnings'}
         >
           Warnings
+        </button>
+
+        <button
+          className={`${styles.toggleBtn} ${styles.errorToggle} ${!showErrors ? styles.toggleOff : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowErrors((v) => !v);
+          }}
+          title={showErrors ? 'Hide errors' : 'Show errors'}
+        >
+          Errors
         </button>
 
         <button

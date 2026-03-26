@@ -85,16 +85,41 @@
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.2px;
+  transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
 }
 
-.toggleBtn:hover {
+.toggleBtn:not(.toggleOff):hover {
   background: rgba(204, 167, 0, 0.2);
+  border-color: #dcb62a;
 }
 
 .toggleOff {
-  border-color: var(--border);
-  color: var(--text-muted);
-  background: transparent;
+  border-color: #3f4144;
+  color: #8f9398;
+  background: #232428;
+}
+
+.toggleOff:hover {
+  border-color: #5b5e63;
+  color: #b7bcc2;
+  background: #2c2f33;
+}
+
+.errorToggle {
+  border-color: var(--error);
+  color: #ffaaaa;
+  background: rgba(244, 71, 71, 0.16);
+}
+
+.errorToggle:not(.toggleOff):hover {
+  border-color: #ff6f6f;
+  background: rgba(244, 71, 71, 0.22);
+}
+
+.errorToggle.toggleOff {
+  border-color: #3f4144;
+  color: #8f9398;
+  background: #232428;
 }
 
 /* ── Body ──────────────────────────────────────── */

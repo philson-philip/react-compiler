@@ -73,23 +73,37 @@
   letter-spacing: 0.2px;
 }
 
-.editorSwitcher {
-  height: 24px;
-  background: var(--bg-input);
-  color: var(--text);
+.editorToggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
   border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 0 8px;
+  border-radius: 999px;
+  background: #2f3135;
+}
+
+.editorOption {
+  min-width: 92px;
+  height: 24px;
+  border-radius: 999px;
+  padding: 0 12px;
   font-size: 11px;
-  outline: none;
+  font-weight: 600;
+  color: #ececec;
+  transition: background 0.15s, color 0.15s;
 }
 
-.editorSwitcher:hover {
-  border-color: var(--text-dim);
+.editorOption:not(.editorOptionActive):hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.editorSwitcher:focus {
-  border-color: var(--accent);
+.editorOptionActive {
+  background: #f0f0f0;
+  color: #2a2a2a;
+}
+
+.editorOptionActive:hover {
+  background: #f0f0f0;
 }
 
 .runBtn {
