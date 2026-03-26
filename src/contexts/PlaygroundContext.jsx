@@ -5,8 +5,8 @@ const PlaygroundContext = createContext(null);
 
 export function PlaygroundProvider({ children }) {
   const [files, setFiles] = useState(() => ({ ...DEFAULT_FILES }));
-  const [activeFile, setActiveFile] = useState('App.js');
-  const [openTabs, setOpenTabs] = useState(['App.js']);
+  const [activeFile, setActiveFile] = useState('App.jsx');
+  const [openTabs, setOpenTabs] = useState(['App.jsx']);
   const [consoleMsgs, setConsoleMsgs] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const msgIdRef = useRef(0);

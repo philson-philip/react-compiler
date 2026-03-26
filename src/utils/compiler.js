@@ -3,7 +3,7 @@
  * React code transpiled with Babel standalone.
  */
 export function buildPreviewHTML(files) {
-  const appCode = files['App.js'] || '';
+  const appCode = files['App.jsx'] || '';
   const cssCode = files['styles.css'] || '';
 
   const processedCode = processAppCode(appCode);

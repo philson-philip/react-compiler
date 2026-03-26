@@ -1,9 +1,9 @@
 export const DEFAULT_FILES = {
-  'App.js': `// Type your code here`,
+  'App.jsx': `// Type your code here`,
 
-  'index.js': `import React from 'react';
+  'index.jsx': `import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
+import App from './App.jsx';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
