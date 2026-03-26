@@ -1,46 +1,5 @@
 export const DEFAULT_FILES = {
-  'App.js': `import React, { useState, useEffect } from 'react';
-
-// Simulate an API call to fetch user data
-const fetchUsers = () => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const users = [
-        { id: 1, name: 'Alice' },
-        { id: 2, name: 'Bob' },
-        { id: 3, name: 'Charlie' },
-        { id: 4, name: 'David' },
-        { id: 5, name: 'Eve' },
-      ];
-      resolve(users);
-    }, 1000); // Simulate a 1-second delay
-  });
-};
-
-const UserList = () => {
-  // Step 1: Declare all the necessary states.
-
-  // Step 2: Fetch users from the API
-
-  // Step 3: Filter users based on search term (implement the logic)
-
-  return (
-    <div>
-      <input
-        type="text"
-        placeholder="Search by name"
-      />
-
-      {/* Step 4: Handle loading and error state */}
-
-      <ul>
-        {/* Step 5: Render the filtered list of users (to be completed) */}
-      </ul>
-    </div>
-  );
-};
-
-export default UserList;`,
+  'App.js': `// Type your code here`,
 
   'index.js': `import React from 'react';
 import ReactDOM from 'react-dom/client';
