@@ -57,7 +57,7 @@ export default function Preview({ runTrigger }) {
               <path d="M9 9l3 3-3 3M15 15h-3" />
             </svg>
             <p>
-              Press <kbd>Ctrl+Enter</kbd> or click <strong>Run</strong>
+              Press <kbd>Cmd+Enter</kbd> or click <strong>Run</strong>
             </p>
           </div>
         )}
