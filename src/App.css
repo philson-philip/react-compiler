@@ -6,6 +6,10 @@
   overflow: hidden;
 }
 
+.app-grid.explorer-collapsed {
+  grid-template-columns: 0 minmax(280px, var(--editor-width, 1fr)) 6px minmax(280px, 1fr);
+}
+
 .preview-column {
   grid-row: 2;
   display: flex;

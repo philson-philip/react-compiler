@@ -125,7 +125,7 @@ export default function CodeEditor({ onRun }) {
           onChange={handleChange}
           onMount={handleEditorDidMount}
           options={{
-            fontSize: 13,
+            fontSize: 15,
             fontFamily: "'Fira Code', Consolas, 'Courier New', monospace",
             fontLigatures: true,
             lineHeight: 20,

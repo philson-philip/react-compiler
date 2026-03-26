@@ -1,13 +1,25 @@
 import { usePlayground } from '../contexts/PlaygroundContext';
-import { buildPreviewHTML } from '../utils/compiler';
 import styles from './TitleBar.module.css';
 
-export default function TitleBar({ onRun }) {
+export default function TitleBar({ onRun, isExplorerCollapsed, onToggleExplorer }) {
   const { activeFile } = usePlayground();
 
   return (
     <div className={styles.titlebar}>
-      <div className={styles.appName}>React Playground</div>
+      <div className={styles.leftGroup}>
+        <button
+          className={styles.iconBtn}
+          onClick={onToggleExplorer}
+          title={isExplorerCollapsed ? 'Show file explorer' : 'Hide file explorer'}
+          aria-label={isExplorerCollapsed ? 'Show file explorer' : 'Hide file explorer'}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <path d="M9 4v16" />
+          </svg>
+        </button>
+        <div className={styles.appName}>React Playground</div>
+      </div>
       <div className={styles.title}>{activeFile} — React Playground</div>
       <button className={styles.runBtn} onClick={onRun} title="Run (Ctrl+Enter)">
         <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">

@@ -10,8 +10,34 @@
   height: var(--titlebar-h);
 }
 
-.appName {
+.leftGroup {
   min-width: 180px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.iconBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-dim);
+}
+
+.iconBtn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.iconBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.appName {
   font-size: 12px;
   font-weight: 600;
   color: var(--text);

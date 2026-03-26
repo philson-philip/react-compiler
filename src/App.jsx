@@ -13,6 +13,7 @@ function AppLayout() {
   const [runTrigger, setRunTrigger] = useState(0);
   const [consoleHeight, setConsoleHeight] = useState(180);
   const [editorWidth, setEditorWidth] = useState(0);
+  const [isExplorerCollapsed, setIsExplorerCollapsed] = useState(false);
   const appGridRef = useRef(null);
   const previewColumnRef = useRef(null);
 
@@ -65,7 +66,7 @@ function AppLayout() {
 
     const onMouseMove = (moveEvent) => {
       const rect = grid.getBoundingClientRect();
-      const sidebarWidth = 210;
+      const sidebarWidth = isExplorerCollapsed ? 0 : 210;
       const splitterWidth = 6;
       const minPaneWidth = 280;
       const maxEditorWidth = Math.max(
@@ -86,15 +87,19 @@ function AppLayout() {
     document.body.classList.add('is-resizing-x');
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('mouseup', onMouseUp);
-  }, []);
+  }, [isExplorerCollapsed]);
 
   return (
     <div
-      className="app-grid"
+      className={`app-grid ${isExplorerCollapsed ? 'explorer-collapsed' : ''}`}
       ref={appGridRef}
       style={editorWidth > 0 ? { '--editor-width': `${editorWidth}px` } : undefined}
     >
-      <TitleBar onRun={handleRun} />
+      <TitleBar
+        onRun={handleRun}
+        isExplorerCollapsed={isExplorerCollapsed}
+        onToggleExplorer={() => setIsExplorerCollapsed((c) => !c)}
+      />
       <FileExplorer />
       <CodeEditor onRun={handleRun} />
       <div
