@@ -24,7 +24,17 @@ export default function TitleBar({
             <path d="M9 4v16" />
           </svg>
         </button>
-        <div className={styles.appName}>React Playground</div>
+        <div className={styles.appName}>
+          React Playground by{' '}
+          <a
+            className={styles.authorLink}
+            href="https://philson.dev"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Philson
+          </a>
+        </div>
       </div>
       <div className={styles.title}>{activeFile} — React Playground</div>
       <div className={styles.rightGroup}>

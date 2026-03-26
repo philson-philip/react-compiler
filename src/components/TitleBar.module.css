@@ -44,6 +44,15 @@
   letter-spacing: 0.2px;
 }
 
+.authorLink {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.authorLink:hover {
+  text-decoration: underline;
+}
+
 .title {
   flex: 1;
   text-align: center;
