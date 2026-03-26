@@ -5,8 +5,10 @@ import { formatCode } from '../utils/formatCode';
 import styles from './CodeEditor.module.css';
 
 const FILE_LANG_MAP = {
-  js: 'javascript',
-  jsx: 'javascript',
+  // Route JS through TS service for richer semantic token colors.
+  js: 'typescript',
+  // Use TypeScript mode for `.jsx` so JSX tags/attributes are tokenized consistently.
+  jsx: 'typescript',
   ts: 'typescript',
   tsx: 'typescript',
   css: 'css',
@@ -59,21 +61,24 @@ export default function CodeEditor({ onRun }) {
     editorRef.current = editor;
     monacoRef.current = monaco;
 
-    // Configure JSX support
-    monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+    // Configure JSX support for both language services.
+    const tsCompilerOptions = {
       jsx: monaco.languages.typescript.JsxEmit.React,
       jsxFactory: 'React.createElement',
       allowJs: true,
-      // Type-check JS so Monaco can produce richer semantic tokens.
+      // Type-check JS so Monaco can produce richer semantic tokens (even with semantic disabled,
+      // it improves parsing/tokenization consistency).
       checkJs: true,
       allowNonTsExtensions: true,
       target: monaco.languages.typescript.ScriptTarget.Latest,
       moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-    });
+    };
 
-    // Add React type hints (basic)
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(
-      `
+    monaco.languages.typescript.javascriptDefaults.setCompilerOptions(tsCompilerOptions);
+    monaco.languages.typescript.typescriptDefaults.setCompilerOptions(tsCompilerOptions);
+
+    // Add React type hints (basic) to both language services.
+    const extraLib = `
       declare const React: any;
       declare const ReactDOM: any;
       declare function useState<T>(init: T): [T, (v: T | ((prev: T) => T)) => void];
@@ -84,9 +89,10 @@ export default function CodeEditor({ onRun }) {
       declare function useContext<T>(ctx: any): T;
       declare function useReducer(reducer: any, init: any): [any, any];
       declare function createContext<T>(defaultVal?: T): any;
-      `,
-      'file:///react-globals.d.ts'
-    );
+    `;
+
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(extraLib, 'file:///react-globals.d.ts');
+    monaco.languages.typescript.typescriptDefaults.addExtraLib(extraLib, 'file:///react-globals.d.ts');
 
     // Ctrl/Cmd+Enter to run
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
@@ -164,7 +170,7 @@ export default function CodeEditor({ onRun }) {
             formatOnPaste: true,
             tabSize: 2,
             wordWrap: 'off',
-            // Color richer "semantic" tokens (e.g. array methods / property access).
+            // Enable semantic token colors (method names, params, properties, etc).
             'semanticHighlighting.enabled': true,
             automaticLayout: true,
             suggest: {
