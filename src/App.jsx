@@ -9,6 +9,7 @@ import StatusBar from './components/StatusBar';
 import './App.css';
 
 const EXPLORER_COLLAPSED_STORAGE_KEY = 'react-playground:explorer-collapsed';
+const EDITOR_ENGINE_STORAGE_KEY = 'react-playground:editor-engine';
 
 function readExplorerCollapsedState() {
   if (typeof window === 'undefined') return false;
@@ -19,12 +20,23 @@ function readExplorerCollapsedState() {
   }
 }
 
+function readEditorEngineState() {
+  if (typeof window === 'undefined') return 'codemirror';
+  try {
+    const value = window.localStorage.getItem(EDITOR_ENGINE_STORAGE_KEY);
+    return value === 'monaco' ? 'monaco' : 'codemirror';
+  } catch {
+    return 'codemirror';
+  }
+}
+
 function AppLayout() {
   const { clearConsole } = usePlayground();
   const [runTrigger, setRunTrigger] = useState(0);
   const [consoleHeight, setConsoleHeight] = useState(180);
   const [editorWidth, setEditorWidth] = useState(0);
   const [isExplorerCollapsed, setIsExplorerCollapsed] = useState(readExplorerCollapsedState);
+  const [editorEngine, setEditorEngine] = useState(readEditorEngineState);
   const appGridRef = useRef(null);
   const previewColumnRef = useRef(null);
 
@@ -56,6 +68,15 @@ function AppLayout() {
       // Ignore storage errors (e.g. private mode restrictions).
     }
   }, [isExplorerCollapsed]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(EDITOR_ENGINE_STORAGE_KEY, editorEngine);
+    } catch {
+      // Ignore storage errors (e.g. private mode restrictions).
+    }
+  }, [editorEngine]);
 
   const handleConsoleResizeStart = useCallback((e) => {
     e.preventDefault();
@@ -122,9 +143,11 @@ function AppLayout() {
         onRun={handleRun}
         isExplorerCollapsed={isExplorerCollapsed}
         onToggleExplorer={() => setIsExplorerCollapsed((c) => !c)}
+        editorEngine={editorEngine}
+        onEditorEngineChange={setEditorEngine}
       />
       <FileExplorer />
-      <CodeEditor onRun={handleRun} />
+      <CodeEditor onRun={handleRun} editorEngine={editorEngine} />
       <div
         className="editor-preview-resizer"
         onMouseDown={handleEditorPreviewResizeStart}

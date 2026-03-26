@@ -52,6 +52,37 @@
   letter-spacing: 0.3px;
 }
 
+.rightGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editorSwitcherLabel {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.2px;
+}
+
+.editorSwitcher {
+  height: 24px;
+  background: var(--bg-input);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 11px;
+  outline: none;
+}
+
+.editorSwitcher:hover {
+  border-color: var(--text-dim);
+}
+
+.editorSwitcher:focus {
+  border-color: var(--accent);
+}
+
 .runBtn {
   display: flex;
   align-items: center;

@@ -83,6 +83,23 @@
   background: var(--bg-editor);
 }
 
+.editorWrap :global(.cm-theme),
+.editorWrap :global(.cm-editor),
+.editorWrap :global(.cm-scroller) {
+  height: 100%;
+}
+
+.editorWrap :global(.cm-content),
+.editorWrap :global(.cm-gutter) {
+  font-family: 'Fira Code', Consolas, 'Courier New', monospace;
+  font-size: 15px;
+  line-height: 20px;
+}
+
+.editorWrap :global(.cm-content) {
+  padding-top: 8px;
+}
+
 /* ── Loading state ─────────────────────────────── */
 .loading {
   display: flex;

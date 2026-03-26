@@ -1,25 +1,39 @@
-import { useRef, useCallback, useEffect } from 'react';
-import Editor from '@monaco-editor/react';
+import { useRef, useCallback, useEffect, useMemo } from 'react';
+import CodeMirror from '@uiw/react-codemirror';
+import { Prec } from '@codemirror/state';
+import { keymap } from '@codemirror/view';
+import { javascript } from '@codemirror/lang-javascript';
+import { css as cssLanguage } from '@codemirror/lang-css';
+import { json as jsonLanguage } from '@codemirror/lang-json';
+import { html as htmlLanguage, autoCloseTags } from '@codemirror/lang-html';
+import { markdown as markdownLanguage } from '@codemirror/lang-markdown';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import MonacoEditor from '@monaco-editor/react';
 import { usePlayground } from '../contexts/PlaygroundContext';
 import { formatCode } from '../utils/formatCode';
 import styles from './CodeEditor.module.css';
 
-const FILE_LANG_MAP = {
-  // Route JS through TS service for richer semantic token colors.
-  js: 'typescript',
-  // Use TypeScript mode for `.jsx` so JSX tags/attributes are tokenized consistently.
-  jsx: 'typescript',
-  ts: 'typescript',
-  tsx: 'typescript',
-  css: 'css',
-  json: 'json',
-  html: 'html',
-  md: 'markdown',
-};
+function getLanguageExtensions(filename) {
+  const ext = filename.split('.').pop()?.toLowerCase();
 
-function getLanguage(filename) {
-  const ext = filename.split('.').pop();
-  return FILE_LANG_MAP[ext] || 'javascript';
+  if (ext === 'css') return [cssLanguage()];
+  if (ext === 'json') return [jsonLanguage()];
+  if (ext === 'html') return [htmlLanguage(), autoCloseTags];
+  if (ext === 'md') return [markdownLanguage()];
+  if (ext === 'ts') return [javascript({ typescript: true })];
+  if (ext === 'tsx') return [javascript({ typescript: true, jsx: true }), autoCloseTags];
+  if (ext === 'jsx') return [javascript({ jsx: true }), autoCloseTags];
+  return [javascript()];
+}
+
+function getMonacoLanguage(filename) {
+  const ext = filename.split('.').pop()?.toLowerCase();
+  if (ext === 'css') return 'css';
+  if (ext === 'json') return 'json';
+  if (ext === 'html') return 'html';
+  if (ext === 'md') return 'markdown';
+  // Route JS/JSX/TS/TSX through TS service for better JSX handling.
+  return 'typescript';
 }
 
 function getTabIconColor(filename) {
@@ -29,45 +43,67 @@ function getTabIconColor(filename) {
   return '#519aba';
 }
 
-export default function CodeEditor({ onRun }) {
-  const {
-    files, activeFile, openTabs,
-    selectFile, closeTab, updateFile,
-  } = usePlayground();
+function CodeMirrorSurface({ activeFile, value, onChange, onRun, onFormatAndRun }) {
+  const extensions = useMemo(() => {
+    return [
+      ...getLanguageExtensions(activeFile),
+      Prec.high(
+        keymap.of([
+          {
+            key: 'Mod-Enter',
+            run: () => {
+              onRun?.();
+              return true;
+            },
+          },
+          {
+            key: 'Mod-s',
+            run: (view) => {
+              const currentCode = view.state.doc.toString();
+              void onFormatAndRun(currentCode);
+              return true;
+            },
+          },
+        ])
+      ),
+    ];
+  }, [activeFile, onFormatAndRun, onRun]);
 
-  const editorRef = useRef(null);
-  const monacoRef = useRef(null);
-  const activeFileRef = useRef(activeFile);
-  const saveSeqRef = useRef(0);
+  return (
+    <CodeMirror
+      key={activeFile}
+      value={value}
+      height="100%"
+      theme={vscodeDark}
+      extensions={extensions}
+      onChange={onChange}
+      basicSetup={{
+        foldGutter: false,
+        lineNumbers: true,
+        highlightActiveLine: true,
+        highlightActiveLineGutter: true,
+        autocompletion: true,
+        closeBrackets: true,
+        defaultKeymap: true,
+        searchKeymap: true,
+      }}
+      editable
+      indentWithTab
+      style={{
+        height: '100%',
+        fontSize: '15px',
+        fontFamily: "'Fira Code', Consolas, 'Courier New', monospace",
+      }}
+    />
+  );
+}
 
-  useEffect(() => {
-    activeFileRef.current = activeFile;
-  }, [activeFile]);
-
-  const handleFormatAndRun = useCallback(async (editor) => {
-    const filename = activeFileRef.current;
-    const currentCode = editor.getValue();
-    const saveSeq = ++saveSeqRef.current;
-    const formatted = await formatCode(filename, currentCode);
-    if (saveSeq !== saveSeqRef.current) return;
-    if (editor.getValue() !== currentCode) return;
-    if (formatted !== currentCode) {
-      updateFile(filename, formatted);
-    }
-    onRun?.();
-  }, [onRun, updateFile]);
-
+function MonacoSurface({ activeFile, value, onChange, onRun, onFormatAndRun }) {
   const handleEditorDidMount = useCallback((editor, monaco) => {
-    editorRef.current = editor;
-    monacoRef.current = monaco;
-
-    // Configure JSX support for both language services.
     const tsCompilerOptions = {
       jsx: monaco.languages.typescript.JsxEmit.React,
       jsxFactory: 'React.createElement',
       allowJs: true,
-      // Type-check JS so Monaco can produce richer semantic tokens (even with semantic disabled,
-      // it improves parsing/tokenization consistency).
       checkJs: true,
       allowNonTsExtensions: true,
       target: monaco.languages.typescript.ScriptTarget.Latest,
@@ -77,34 +113,15 @@ export default function CodeEditor({ onRun }) {
     monaco.languages.typescript.javascriptDefaults.setCompilerOptions(tsCompilerOptions);
     monaco.languages.typescript.typescriptDefaults.setCompilerOptions(tsCompilerOptions);
 
-    // Add React type hints (basic) to both language services.
-    const extraLib = `
-      declare const React: any;
-      declare const ReactDOM: any;
-      declare function useState<T>(init: T): [T, (v: T | ((prev: T) => T)) => void];
-      declare function useEffect(fn: () => void | (() => void), deps?: any[]): void;
-      declare function useCallback<T>(fn: T, deps: any[]): T;
-      declare function useMemo<T>(fn: () => T, deps: any[]): T;
-      declare function useRef<T>(init?: T): { current: T };
-      declare function useContext<T>(ctx: any): T;
-      declare function useReducer(reducer: any, init: any): [any, any];
-      declare function createContext<T>(defaultVal?: T): any;
-    `;
-
-    monaco.languages.typescript.javascriptDefaults.addExtraLib(extraLib, 'file:///react-globals.d.ts');
-    monaco.languages.typescript.typescriptDefaults.addExtraLib(extraLib, 'file:///react-globals.d.ts');
-
-    // Ctrl/Cmd+Enter to run
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
       onRun?.();
     });
 
-    // Ctrl/Cmd+S to run
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-      handleFormatAndRun(editor);
+      void onFormatAndRun(editor.getValue());
     });
 
-    // Fallback auto-close for JSX/HTML tags in Monaco.
+    // Auto-close tags fallback for Monaco.
     editor.onDidType((text) => {
       if (text !== '>') return;
 
@@ -121,17 +138,12 @@ export default function CodeEditor({ onRun }) {
       const tagMatch = beforeCursor.match(/<([A-Za-z][\w:-]*)\b[^<>]*>$/);
       if (!tagMatch) return;
 
-      const openingTag = tagMatch[0];
-      if (openingTag.startsWith('</')) return;
-
       const tagName = tagMatch[1];
       if (!tagName) return;
 
-      // Avoid common non-JSX generic/comparison cases like `foo<Bar>`.
       const ltIndex = beforeCursor.lastIndexOf('<');
       const charBeforeLt = ltIndex > 0 ? beforeCursor[ltIndex - 1] : '';
       if (/[A-Za-z0-9_$.)\]]/.test(charBeforeLt)) return;
-
       if (afterCursor.trimStart().startsWith(`</${tagName}`)) return;
 
       editor.executeEdits('auto-close-tag', [
@@ -149,14 +161,71 @@ export default function CodeEditor({ onRun }) {
 
       editor.setPosition(position);
     });
+  }, [onFormatAndRun, onRun]);
 
-    editor.focus();
-  }, [handleFormatAndRun, onRun]);
+  return (
+    <MonacoEditor
+      key={activeFile}
+      height="100%"
+      language={getMonacoLanguage(activeFile)}
+      value={value}
+      theme="vs-dark"
+      onChange={(next) => onChange(next ?? '')}
+      onMount={handleEditorDidMount}
+      options={{
+        fontSize: 15,
+        fontFamily: "'Fira Code', Consolas, 'Courier New', monospace",
+        lineHeight: 20,
+        minimap: { enabled: false },
+        scrollBeyondLastLine: false,
+        padding: { top: 8 },
+        renderLineHighlight: 'line',
+        smoothScrolling: true,
+        bracketPairColorization: { enabled: true },
+        autoClosingBrackets: 'always',
+        autoClosingQuotes: 'always',
+        autoClosingTags: 'always',
+        formatOnPaste: true,
+        tabSize: 2,
+        wordWrap: 'off',
+        automaticLayout: true,
+      }}
+    />
+  );
+}
+
+export default function CodeEditor({ onRun, editorEngine }) {
+  const {
+    files, activeFile, openTabs,
+    selectFile, closeTab, updateFile,
+  } = usePlayground();
+
+  const activeFileRef = useRef(activeFile);
+  const filesRef = useRef(files);
+  const saveSeqRef = useRef(0);
+
+  useEffect(() => {
+    activeFileRef.current = activeFile;
+  }, [activeFile]);
+
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
+
+  const handleFormatAndRun = useCallback(async (currentCode) => {
+    const filename = activeFileRef.current;
+    const saveSeq = ++saveSeqRef.current;
+    const formatted = await formatCode(filename, currentCode);
+    if (saveSeq !== saveSeqRef.current) return;
+    if (filesRef.current[filename] !== currentCode) return;
+    if (formatted !== currentCode) {
+      updateFile(filename, formatted);
+    }
+    onRun?.();
+  }, [onRun, updateFile]);
 
   const handleChange = useCallback((value) => {
-    if (value !== undefined) {
-      updateFile(activeFile, value);
-    }
+    updateFile(activeFile, value);
   }, [activeFile, updateFile]);
 
   return (
@@ -188,50 +257,24 @@ export default function CodeEditor({ onRun }) {
         })}
       </div>
 
-      {/* Monaco Editor */}
       <div className={styles.editorWrap}>
-        <Editor
-          key={activeFile}
-          height="100%"
-          language={getLanguage(activeFile)}
-          value={files[activeFile] ?? ''}
-          theme="vs-dark"
-          onChange={handleChange}
-          onMount={handleEditorDidMount}
-          options={{
-            fontSize: 15,
-            fontFamily: "'Fira Code', Consolas, 'Courier New', monospace",
-            fontLigatures: true,
-            lineHeight: 20,
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            padding: { top: 8 },
-            renderLineHighlight: 'line',
-            cursorBlinking: 'smooth',
-            cursorSmoothCaretAnimation: 'on',
-            smoothScrolling: true,
-            bracketPairColorization: { enabled: true },
-            autoClosingBrackets: 'always',
-            autoClosingQuotes: 'always',
-            autoClosingTags: 'always',
-            formatOnPaste: true,
-            tabSize: 2,
-            wordWrap: 'off',
-            // Enable semantic token colors (method names, params, properties, etc).
-            'semanticHighlighting.enabled': true,
-            automaticLayout: true,
-            suggest: {
-              showKeywords: true,
-              showSnippets: true,
-            },
-          }}
-          loading={
-            <div className={styles.loading}>
-              <div className={styles.spinner} />
-              Loading editor...
-            </div>
-          }
-        />
+        {editorEngine === 'monaco' ? (
+          <MonacoSurface
+            activeFile={activeFile}
+            value={files[activeFile] ?? ''}
+            onChange={handleChange}
+            onRun={onRun}
+            onFormatAndRun={handleFormatAndRun}
+          />
+        ) : (
+          <CodeMirrorSurface
+            activeFile={activeFile}
+            value={files[activeFile] ?? ''}
+            onChange={handleChange}
+            onRun={onRun}
+            onFormatAndRun={handleFormatAndRun}
+          />
+        )}
       </div>
     </div>
   );
