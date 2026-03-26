@@ -64,6 +64,8 @@ export default function CodeEditor({ onRun }) {
       jsx: monaco.languages.typescript.JsxEmit.React,
       jsxFactory: 'React.createElement',
       allowJs: true,
+      // Type-check JS so Monaco can produce richer semantic tokens.
+      checkJs: true,
       allowNonTsExtensions: true,
       target: monaco.languages.typescript.ScriptTarget.Latest,
       moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
@@ -162,6 +164,8 @@ export default function CodeEditor({ onRun }) {
             formatOnPaste: true,
             tabSize: 2,
             wordWrap: 'off',
+            // Color richer "semantic" tokens (e.g. array methods / property access).
+            'semanticHighlighting.enabled': true,
             automaticLayout: true,
             suggest: {
               showKeywords: true,
