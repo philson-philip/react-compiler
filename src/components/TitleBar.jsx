@@ -7,11 +7,7 @@ export default function TitleBar({ onRun }) {
 
   return (
     <div className={styles.titlebar}>
-      <div className={styles.dots}>
-        <span className={styles.red} />
-        <span className={styles.yellow} />
-        <span className={styles.green} />
-      </div>
+      <div className={styles.appName}>React Playground</div>
       <div className={styles.title}>{activeFile} — React Playground</div>
       <button className={styles.runBtn} onClick={onRun} title="Run (Ctrl+Enter)">
         <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">

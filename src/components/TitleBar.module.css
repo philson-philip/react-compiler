@@ -10,19 +10,13 @@
   height: var(--titlebar-h);
 }
 
-.dots {
-  display: flex;
-  gap: 8px;
-  padding-right: 12px;
+.appName {
+  min-width: 180px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.2px;
 }
-.dots span {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-.red { background: #ec6a5e; }
-.yellow { background: #f4bf4f; }
-.green { background: #61c554; }
 
 .title {
   flex: 1;
