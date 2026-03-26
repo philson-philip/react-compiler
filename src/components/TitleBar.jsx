@@ -28,7 +28,7 @@ export default function TitleBar({
           React Playground by{' '}
           <a
             className={styles.authorLink}
-            href="https://philson.dev"
+            href="https://philson.me"
             target="_blank"
             rel="noreferrer"
           >
